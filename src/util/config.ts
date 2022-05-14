@@ -4,6 +4,7 @@ import { build_object_from_paths } from '$/util/paths'
 
 import { container_config, any } from '$/types/ContainerConfig'
 import type { ContainerConfig } from '$/types/ContainerConfig'
+import { ContainerInfo } from 'dockerode'
 
 
 const build_config_from_labels = (labels: Record<string, string>): Either<D.DecodeError, ContainerConfig> | undefined => {
@@ -21,6 +22,12 @@ const build_config_from_labels = (labels: Record<string, string>): Either<D.Deco
   return container_config.decode(maybe_tracked_config.right.harbor)
 }
 
+const get_configs = (containers: ContainerInfo[]): Either<D.DecodeError, ContainerConfig>[] =>
+  containers
+    .map(container => build_config_from_labels(container.Labels))
+    .filter(config => config !== undefined) as Either<D.DecodeError, ContainerConfig>[]
+
 export {
-  build_config_from_labels
+  build_config_from_labels,
+  get_configs
 }
