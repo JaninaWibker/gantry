@@ -1,0 +1,17 @@
+{
+  "quiet": true,
+  "watch": [
+    "src",
+    "@types",
+    ".env",
+    ".eslintrc",
+    "tsconfig.json"
+  ],
+  "ignore": [
+    "src/test",
+    "src/**/*.test.ts",
+    "src/**/*test.js"
+  ],
+  "ext": ".ts,.js,.json",
+  "exec": "./on-watch.sh"
+}
