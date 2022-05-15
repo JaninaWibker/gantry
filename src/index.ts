@@ -29,10 +29,11 @@ handle_arguments({
 
 docker.listContainers()
   .then(get_configs)
-  .then(configs => configs.map(maybe_config => {
-    if(isLeft(maybe_config)) {
-      console.log(D.draw(maybe_config.left))
+  .then(containers => containers.map(maybe_container => {
+    if(isLeft(maybe_container)) {
+      console.log(D.draw(maybe_container.left))
     } else {
-      console.log(maybe_config.right)
+      const container = maybe_container.right
+      console.log(container)
     }
   }))

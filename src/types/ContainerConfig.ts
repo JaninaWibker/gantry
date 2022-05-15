@@ -64,6 +64,18 @@ const container_config = D.intersect(
 
 export type ContainerConfig = D.TypeOf<typeof container_config>
 
+export type HarborContainer = {
+  container: {
+    id: string,
+    image: {
+      name: string,
+      id: string
+    },
+    state: string
+  },
+  config: ContainerConfig
+}
+
 export {
   container_config,
   any
