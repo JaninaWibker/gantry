@@ -1,8 +1,10 @@
 import path from 'path'
+import { spawn } from 'child_process'
 import { write_json_if_differ } from '$/util/fs'
 import type { HarborContainer } from '$/types/ContainerConfig'
 
 const COMMAND_WORKING_DIRECTORY = path.join(process.cwd(), 'runtime')
+const WEBHOOKS_EXECUTABLE = path.join(COMMAND_WORKING_DIRECTORY, 'webhook')
 const HOOKS_FILE = path.join(process.cwd(), 'runtime', 'hooks.json')
 
 const generate_github_hook = (container: HarborContainer): object => {
@@ -34,8 +36,35 @@ const generate_github_hook = (container: HarborContainer): object => {
     'id': `redeploy-${container.config.name}`,
     'execute-command': 'on-action.sh',
     'command-working-directory': COMMAND_WORKING_DIRECTORY,
-    'pass-arguments-to-command': [ // TODO: what arguments are needed for 'action'?
-
+    'pass-arguments-to-command': [
+      { // container id
+        source: 'string',
+        name: container.container.id
+      },
+      { // ref
+        source: 'payload',
+        name: 'ref'
+      },
+      { // commit (id)
+        source: 'payload',
+        name: 'head_commit.id'
+      },
+      { // commit (message)
+        source: 'payload',
+        name: 'head_commit.message'
+      },
+      { // author (fullname)
+        source: 'payload',
+        name: 'pusher.full_name'
+      },
+      { // author (username)
+        source: 'payload',
+        name: 'pusher.username'
+      },
+      { // author (email)
+        source: 'payload',
+        name: 'pusher.email'
+      }
     ],
     'trigger-rule': {
       and: [
@@ -64,11 +93,23 @@ const generate_webhook_config = (container: HarborContainer): object => {
 const update_webhooks = (containers: HarborContainer[]) => {
   const hooks = containers.map(generate_webhook_config)
 
-  write_json_if_differ(HOOKS_FILE, hooks)
+  return write_json_if_differ(HOOKS_FILE, hooks)
+}
 
+const spawn_webhook = () => {
+  // TODO: should this be verbose and should the port be configurable?
+  const child = spawn(WEBHOOKS_EXECUTABLE, ['-hooks', 'hooks.json', '-port', '8000', '-verbose'], { cwd: COMMAND_WORKING_DIRECTORY })
+
+  child.on('exit', (code, signal) => {
+    console.log(`webhook quit with exit code ${code} and signal ${signal}`)
+  })
+
+  child.stdout.on('data', data => console.log(data.toString()))
+  child.stderr.on('data', data => console.error(data.toString()))
 }
 
 export {
   generate_webhook_config,
   update_webhooks,
+  spawn_webhook,
 }
