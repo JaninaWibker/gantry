@@ -3,6 +3,7 @@ import { get_configs } from '$/util/config'
 import { handle_arguments } from '$/util/cli'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as D from 'io-ts/Decoder'
+import { generate_webhook_config } from '$/util/webhook'
 
 import type { Settings } from '$/util/cli'
 
@@ -35,5 +36,6 @@ docker.listContainers()
     } else {
       const container = maybe_container.right
       console.log(container)
+      console.log(JSON.stringify(generate_webhook_config(container), null, 2))
     }
   }))
