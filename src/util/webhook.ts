@@ -1,7 +1,9 @@
+import path from 'path'
+import { write_json_if_differ } from '$/util/fs'
 import type { HarborContainer } from '$/types/ContainerConfig'
 
-// const COMMAND_WORKING_DIRECTORY = '____FOLDER____' // TODO: is this just determined by the node process?
-const COMMAND_WORKING_DIRECTORY = process.cwd() + '/runtime'
+const COMMAND_WORKING_DIRECTORY = path.join(process.cwd(), 'runtime')
+const HOOKS_FILE = path.join(process.cwd(), 'runtime', 'hooks.json')
 
 const generate_github_hook = (container: HarborContainer): object => {
 
@@ -32,7 +34,7 @@ const generate_github_hook = (container: HarborContainer): object => {
     'id': `redeploy-${container.config.name}`,
     'execute-command': 'on-action.sh',
     'command-working-directory': COMMAND_WORKING_DIRECTORY,
-    'pass-arguments-to-command': [
+    'pass-arguments-to-command': [ // TODO: what arguments are needed for 'action'?
 
     ],
     'trigger-rule': {
@@ -59,6 +61,14 @@ const generate_webhook_config = (container: HarborContainer): object => {
   }
 }
 
+const update_webhooks = (containers: HarborContainer[]) => {
+  const hooks = containers.map(generate_webhook_config)
+
+  write_json_if_differ(HOOKS_FILE, hooks)
+
+}
+
 export {
-  generate_webhook_config
+  generate_webhook_config,
+  update_webhooks,
 }

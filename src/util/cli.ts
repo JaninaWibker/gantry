@@ -1,15 +1,17 @@
 export type Settings = {
   poll_interval: number,
-  ignore_not_running: boolean
+  ignore_not_running: boolean,
+  verbose: boolean
 }
 
 const handle_arguments = ({ on_watch, on_action }: { on_watch: (settings: Settings) => any, on_action: (settings: Settings, args: string[]) => any }) => {
-  const [_node, _pwd, mode, ...args] = process.argv
+  const [/* _node */, /* _pwd */, mode, ...args] = process.argv
 
   // TODO: harbor should look at it's own docker labels (or use some defaults when not running inside docker) for settings
   const DEFAULT_SETTINGS = {
     poll_interval: 30,
-    ignore_not_running: false
+    ignore_not_running: false,
+    verbose: true // TODO: this shouldn't be the default
   }
 
   switch(mode) {
