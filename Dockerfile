@@ -39,9 +39,9 @@ FROM node:18
 WORKDIR /app
 
 # copy over builds
-COPY --from=build-webhook /webhook/webhook    /app/webhook
+COPY --from=build-webhook /webhook/webhook    /app/runtime/webhook
 COPY --from=build-harbor /harbor/dist         /app/dist
 COPY --from=build-harbor /harbor/node_modules /app/node_modules
 
 # run harbor
-CMD node dist/index.js
+CMD node dist/index.js watch

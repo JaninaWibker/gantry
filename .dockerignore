@@ -3,3 +3,5 @@ dist
 .buildcache
 .git
 .gitignore
+runtime/webhook
+runtime/hooks.json

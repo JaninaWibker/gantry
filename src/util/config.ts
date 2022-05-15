@@ -16,7 +16,7 @@ const build_config_from_labels = (labels: Record<string, string>): Either<D.Deco
 
   const maybe_tracked_config = D.struct({ harbor: D.intersect(D.struct({ enable: D.literal('true') }))(any) }).decode(unchecked_config)
 
-  // container doesn't have enabled label set to true or is not tracked at all
+  // container doesn't have "enable"-label set to true or the container is not tracked at all
   if(isLeft(maybe_tracked_config)) return undefined
 
   return container_config.decode(maybe_tracked_config.right.harbor)
