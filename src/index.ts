@@ -24,7 +24,7 @@ const update_hooks = (docker: Docker, settings: Settings) => docker.listContaine
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' })
 
-handle_arguments({
+handle_arguments(docker, {
   on_watch: (settings: Settings) => {
     update_hooks(docker, settings)
       .then(spawn_webhook)
@@ -59,6 +59,6 @@ handle_arguments({
       })
 
     config
-      .then(handle_build)
+      .then(config => handle_build(settings, config))
   }
 })

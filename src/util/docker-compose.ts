@@ -1,23 +1,23 @@
-import { promisify } from 'util'
-import { exec as raw_spawn } from 'child_process'
+import { run_on_host } from './run-on-host'
 
-const DOCKER_COMPOSE = 'docker-compose'
+import type { Settings } from './cli'
 
-const spawn = promisify(raw_spawn)
-
-const compose_build = (cwd: string) => {
-  console.log(`called with ${cwd}`)
-  return spawn(`${DOCKER_COMPOSE} build`, { cwd: cwd })
+const compose_build = (settings: Settings, cwd: string) => {
+  console.log(`compose_build called with ${cwd}`)
+  return run_on_host('docker-compose build', { cwd: cwd, user: settings.user, docker: settings.docker })
 }
 
-const compose_restart = (cwd: string, env_file?: string) => {
-  console.log(`called with ${cwd} and ${env_file}`)
+const compose_restart = (settings: Settings, cwd: string, env_file?: string) => {
+  console.log(`compose_restart called with ${cwd} and ${env_file}`)
   return env_file !== undefined
-    ? spawn(`${DOCKER_COMPOSE} --env-file ${env_file} up -d`, { cwd: cwd })
-    : spawn(`${DOCKER_COMPOSE} up -d`, { cwd: cwd })
+    ? run_on_host(`docker-compose --env-file ${env_file} up -d`, { cwd: cwd, user: settings.user, docker: settings.docker })
+    : run_on_host(`docker-compose up -d`, { cwd: cwd, user: settings.user, docker: settings.docker })
 }
+
+const git_pull = (settings: Settings, cwd: string) => run_on_host('git pull', { cwd: cwd, user: settings.user, docker: settings.docker })
 
 export {
   compose_build,
-  compose_restart
+  compose_restart,
+  git_pull
 }
