@@ -6,15 +6,13 @@ import type { Settings } from './cli'
 
 const handle_docker_build = <WebhookType extends WebhookTypesRaw>(settings: Settings, container: HarborContainer<WebhookType, BuildTypes['docker']>) => {
   console.log(container)
-  // okay what do we have?
-  // we need to clone first!!!
-  // we have a current working directory and basically need to run docker-compose build and docker-compose up -d (maybe including an env file?)
-  // that is something that can be done quite easily i'd say
+
+  const config = container.config.build
+
   return Promise.resolve()
-    .then(() => git_pull(settings, container.config.build.git_repo))
-    .then(() => compose_build(settings, container.config.build.working_directory))
-    .then((data) => (console.log(data), compose_restart(settings, container.config.build.working_directory, container.config.build.env_file || undefined)))
-    .then(data => console.log(data))
+    .then(() => git_pull(settings, config.git_repo))
+    .then(() => compose_build(settings, config.working_directory, config.env_file || undefined))
+    .then(() => compose_restart(settings, config.working_directory, config.env_file || undefined))
     .catch(err => console.log(err))
 }
 

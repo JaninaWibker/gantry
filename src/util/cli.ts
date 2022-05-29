@@ -17,7 +17,7 @@ const handle_arguments = (docker: Dockerode, { on_watch, on_action }: { on_watch
     ignore_not_running: false,
     verbose: true, // TODO: this shouldn't be the default
     docker: docker,
-    user: 'jannik' // TODO: THIS MOST DEF. SHOULDN'T BE ANY KIND OF DEFAULT
+    user: '1000' // TODO: THIS MOST DEF. SHOULDN'T BE ANY KIND OF DEFAULT
   }
 
   switch(mode) {
