@@ -1,13 +1,13 @@
 import path from 'path'
 import { spawn } from 'child_process'
 import { write_json_if_differ } from '$/util/fs'
-import type { HarborContainer } from '$/types/ContainerConfig'
+import type { HarborContainer, WebhookTypes } from '$/types/ContainerConfig'
 
 const COMMAND_WORKING_DIRECTORY = path.join(process.cwd(), 'runtime')
 const WEBHOOKS_EXECUTABLE = path.join(COMMAND_WORKING_DIRECTORY, 'webhook')
 const HOOKS_FILE = path.join(process.cwd(), 'runtime', 'hooks.json')
 
-const generate_github_hook = (container: HarborContainer): object => {
+const generate_github_hook = (container: HarborContainer<WebhookTypes['github']>): object => {
 
   const signature_check = (secret: string) => ({
     match: {
@@ -75,16 +75,16 @@ const generate_github_hook = (container: HarborContainer): object => {
   }
 }
 
-const generate_gitea_hook = (container: HarborContainer): object => {
+const generate_gitea_hook = (container: HarborContainer<WebhookTypes['gitea']>): object => {
   // gitea and github actually have very similar webhooks, if any changes are to
   // be found, can later on still just replace this with its own hook generation.
-  return generate_github_hook(container)
+  return generate_github_hook(container as unknown as HarborContainer<WebhookTypes['github']>)
 }
 
 const generate_webhook_config = (container: HarborContainer): object => {
   switch (container.config.webhook.method) {
-    case 'github': return generate_github_hook(container)
-    case 'gitea': return generate_gitea_hook(container)
+    case 'github': return generate_github_hook(container as HarborContainer<WebhookTypes['github']>)
+    case 'gitea': return generate_gitea_hook(container as HarborContainer<WebhookTypes['gitea']>)
     default:
       throw new Error(`unknown webhook method ${(container.config.webhook as { method: string }).method} found`)
   }

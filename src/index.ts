@@ -4,6 +4,7 @@ import { handle_arguments } from '$/util/cli'
 import { isLeft, isRight } from 'fp-ts/lib/Either'
 import * as D from 'io-ts/Decoder'
 import { update_webhooks, spawn_webhook } from '$/util/webhook'
+import { handle_build } from '$/util/build'
 
 import type { Settings } from '$/util/cli'
 
@@ -42,6 +43,7 @@ handle_arguments({
       commit_msg:   ${commit_message.trim()}
       author:       ${author_fullname || author_username} (${author_email})
     `.trim())
+
     const config = docker.listContainers()
       .then(containers => containers.find(container => container.Id === container_id))
       .then(container => {
@@ -57,17 +59,6 @@ handle_arguments({
       })
 
     config
-      .then(console.log)
+      .then(handle_build)
   }
 })
-
-// docker.listContainers()
-//   .then(get_configs)
-//   .then(containers => containers.map(maybe_container => {
-//     if(isLeft(maybe_container)) {
-//       console.log(D.draw(maybe_container.left))
-//     } else {
-//       const container = maybe_container.right
-//       console.log(container)
-//     }
-//   }))
