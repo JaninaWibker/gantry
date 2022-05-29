@@ -13,7 +13,7 @@ const container_build_config = D.union(
    * docker method:
    * pulls changes using git and then rebuilts containers using docker-compose build
    * */
-  D.struct({ method: D.literal('docker'),  working_directory: D.string }), // TODO: git related things?
+  D.struct({ method: D.literal('docker'),  working_directory: D.string, git_repo: D.string, env_file: D.nullable(D.string) }),
   /**
    * ansible method:
    * runs the corresponding ansible playbook which in turn does all deployment related things such as pulling git repos, building containers and starting them
