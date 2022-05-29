@@ -1,2 +1,3 @@
 #!/bin/bash
-node ../dist/index.js action "$@"
+cd ..
+node dist/index.js action "$@"
