@@ -101,7 +101,7 @@ const spawn_webhook = () => {
   const child = spawn(WEBHOOKS_EXECUTABLE, ['-hooks', 'hooks.json', '-port', '8000', '-verbose'], { cwd: COMMAND_WORKING_DIRECTORY })
 
   child.on('exit', (code, signal) => {
-    console.log(`webhook quit with exit code ${code} and signal ${signal}`)
+    console.log(`[harbor] webhook quit with exit code ${code} and signal ${signal}`)
   })
 
   child.stdout.on('data', data => console.log(data.toString()))
