@@ -1,13 +1,13 @@
 import path from 'path'
 import { spawn } from 'child_process'
 import { write_json_if_differ } from '$/util/fs'
-import type { HarborContainer, WebhookTypes } from '$/types/ContainerConfig'
+import type { GantryContainer, WebhookTypes } from '$/types/ContainerConfig'
 
 const COMMAND_WORKING_DIRECTORY = path.join(process.cwd(), 'runtime')
 const WEBHOOKS_EXECUTABLE = path.join(COMMAND_WORKING_DIRECTORY, 'webhook')
 const HOOKS_FILE = path.join(process.cwd(), 'runtime', 'hooks.json')
 
-const generate_github_hook = (container: HarborContainer<WebhookTypes['github']>): object => {
+const generate_github_hook = (container: GantryContainer<WebhookTypes['github']>): object => {
 
   const signature_check = (secret: string) => ({
     match: {
@@ -75,22 +75,22 @@ const generate_github_hook = (container: HarborContainer<WebhookTypes['github']>
   }
 }
 
-const generate_gitea_hook = (container: HarborContainer<WebhookTypes['gitea']>): object => {
+const generate_gitea_hook = (container: GantryContainer<WebhookTypes['gitea']>): object => {
   // gitea and github actually have very similar webhooks, if any changes are to
   // be found, can later on still just replace this with its own hook generation.
-  return generate_github_hook(container as unknown as HarborContainer<WebhookTypes['github']>)
+  return generate_github_hook(container as unknown as GantryContainer<WebhookTypes['github']>)
 }
 
-const generate_webhook_config = (container: HarborContainer): object => {
+const generate_webhook_config = (container: GantryContainer): object => {
   switch (container.config.webhook.method) {
-    case 'github': return generate_github_hook(container as HarborContainer<WebhookTypes['github']>)
-    case 'gitea': return generate_gitea_hook(container as HarborContainer<WebhookTypes['gitea']>)
+    case 'github': return generate_github_hook(container as GantryContainer<WebhookTypes['github']>)
+    case 'gitea': return generate_gitea_hook(container as GantryContainer<WebhookTypes['gitea']>)
     default:
       throw new Error(`unknown webhook method ${(container.config.webhook as { method: string }).method} found`)
   }
 }
 
-const update_webhooks = (containers: HarborContainer[]) => {
+const update_webhooks = (containers: GantryContainer[]) => {
   const hooks = containers.map(generate_webhook_config)
 
   return write_json_if_differ(HOOKS_FILE, hooks)
@@ -101,7 +101,7 @@ const spawn_webhook = () => {
   const child = spawn(WEBHOOKS_EXECUTABLE, ['-hooks', 'hooks.json', '-port', '8000', '-verbose'], { cwd: COMMAND_WORKING_DIRECTORY })
 
   child.on('exit', (code, signal) => {
-    console.log(`[harbor] webhook quit with exit code ${code} and signal ${signal}`)
+    console.log(`[gantry] webhook quit with exit code ${code} and signal ${signal}`)
   })
 
   child.stdout.on('data', data => console.log(data.toString()))

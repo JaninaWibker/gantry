@@ -7,7 +7,7 @@ import { update_webhooks, spawn_webhook } from '$/util/webhook'
 import { handle_build } from '$/util/build'
 
 import type { Settings } from '$/util/cli'
-import type { HarborContainer } from './types/ContainerConfig'
+import type { GantryContainer } from './types/ContainerConfig'
 
 const update_hooks = (docker: Docker, settings: Settings) => docker.listContainers()
   .then(get_configs)
@@ -15,18 +15,18 @@ const update_hooks = (docker: Docker, settings: Settings) => docker.listContaine
     const erroneous_containers = containers.filter(isLeft).map(container => container.left)
     const valid_containers     = containers.filter(isRight).map(container => container.right)
 
-    if(settings.verbose) { erroneous_containers.map(container => console.log('[harbor] ' + D.draw(container))) }
+    if(settings.verbose) { erroneous_containers.map(container => console.log('[gantry] ' + D.draw(container))) }
 
     return update_webhooks(valid_containers)
       .then((did_update: boolean) => {
-        if(did_update) console.log('[harbor] successfully updated hooks.json file')
+        if(did_update) console.log('[gantry] successfully updated hooks.json file')
       })
   })
 
-const print_job_started = (args: string[], config: HarborContainer) => {
+const print_job_started = (args: string[], config: GantryContainer) => {
   const [container_id, branch_ref, commit_id, commit_message, author_fullname, author_username, author_email] = args
 
-  console.log(`[harbor] redeploying ${config.config.name} (received from ${config.config.webhook.method}; redeploying using ${config.config.build.method})
+  console.log(`[gantry] redeploying ${config.config.name} (received from ${config.config.webhook.method}; redeploying using ${config.config.build.method})
 container_id: ${container_id}
 branch_ref:   ${branch_ref}
 commit_id:    ${commit_id}
@@ -37,12 +37,12 @@ author:       ${author_fullname || author_username} (${author_email})
   return config
 }
 
-const print_job_success = (args: string[], config: HarborContainer) => {
-  console.log(`[harbor] successfully redeployed ${config.config.name} (container: ${config.container.id})`)
+const print_job_success = (args: string[], config: GantryContainer) => {
+  console.log(`[gantry] successfully redeployed ${config.config.name} (container: ${config.container.id})`)
 }
 
 const print_job_failure = (error: Error) => {
-  console.error('[harbor] error: ' + error.message)
+  console.error('[gantry] error: ' + error.message)
 }
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' })
@@ -69,7 +69,7 @@ handle_arguments(docker, {
       .then(container => build_config_from_labels(container.Labels, { id: container.Id, image: { name: container.Image, id: container.ImageID }, state: container.State }))
       .then(container => {
         if(container === undefined || isLeft(container)) {
-          throw new Error(`container ${container_id} not tracked or has invalid harbor config`)
+          throw new Error(`container ${container_id} not tracked or has invalid gantry config`)
         }
         return container.right
       })

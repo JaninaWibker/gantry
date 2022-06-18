@@ -1,9 +1,9 @@
 import { compose_build, compose_restart, git_pull } from '$/util/docker-compose'
 
-import type { BuildTypes, HarborContainer, WebhookTypesRaw } from '$/types/ContainerConfig'
+import type { BuildTypes, GantryContainer, WebhookTypesRaw } from '$/types/ContainerConfig'
 import type { Settings } from './cli'
 
-const handle_docker_build = <WebhookType extends WebhookTypesRaw>(settings: Settings, container: HarborContainer<WebhookType, BuildTypes['docker']>): Promise<void> => {
+const handle_docker_build = <WebhookType extends WebhookTypesRaw>(settings: Settings, container: GantryContainer<WebhookType, BuildTypes['docker']>): Promise<void> => {
 
   const config = container.config.build
 
@@ -13,7 +13,7 @@ const handle_docker_build = <WebhookType extends WebhookTypesRaw>(settings: Sett
     .then(() => compose_restart(settings, config.working_directory, config.env_file || undefined))
 }
 
-const handle_ansible_build = <WebhookType extends WebhookTypesRaw>(settings: Settings, container: HarborContainer<WebhookType, BuildTypes['ansible']>): Promise<void> => {
+const handle_ansible_build = <WebhookType extends WebhookTypesRaw>(settings: Settings, container: GantryContainer<WebhookType, BuildTypes['ansible']>): Promise<void> => {
 
   const config = container.config.build
   console.log(container, config)
@@ -21,7 +21,7 @@ const handle_ansible_build = <WebhookType extends WebhookTypesRaw>(settings: Set
   return Promise.resolve()
 }
 
-const handle_command_build = <WebhookType extends WebhookTypesRaw>(settings: Settings, container: HarborContainer<WebhookType, BuildTypes['command']>): Promise<void> => {
+const handle_command_build = <WebhookType extends WebhookTypesRaw>(settings: Settings, container: GantryContainer<WebhookType, BuildTypes['command']>): Promise<void> => {
 
   const config = container.config.build
   console.log(container, config)
@@ -29,11 +29,11 @@ const handle_command_build = <WebhookType extends WebhookTypesRaw>(settings: Set
   return Promise.resolve()
 }
 
-const handle_build = <WebhookType extends WebhookTypesRaw>(settings: Settings, container: HarborContainer<WebhookType>): Promise<HarborContainer<WebhookType>> => {
+const handle_build = <WebhookType extends WebhookTypesRaw>(settings: Settings, container: GantryContainer<WebhookType>): Promise<GantryContainer<WebhookType>> => {
   switch(container.config.build.method) {
-    case 'docker':  return handle_docker_build(settings, container as HarborContainer<WebhookType, BuildTypes['docker']>).then(() => container)
-    case 'ansible': return handle_ansible_build(settings, container as HarborContainer<WebhookType, BuildTypes['ansible']>).then(() => container)
-    case 'command': return handle_command_build(settings, container as HarborContainer<WebhookType, BuildTypes['command']>).then(() => container)
+    case 'docker':  return handle_docker_build(settings, container as GantryContainer<WebhookType, BuildTypes['docker']>).then(() => container)
+    case 'ansible': return handle_ansible_build(settings, container as GantryContainer<WebhookType, BuildTypes['ansible']>).then(() => container)
+    case 'command': return handle_command_build(settings, container as GantryContainer<WebhookType, BuildTypes['command']>).then(() => container)
     default:
       throw new Error(`unknown build method ${(container.config.build as { method: string }).method} found`)
   }

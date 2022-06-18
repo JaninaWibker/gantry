@@ -87,7 +87,7 @@ export type ContainerConfig<
   NarrowBuild extends BuildTypesRaw = BuildTypesRaw
 > = Narrow<Narrow<ContainerConfigRaw, 'webhook', NarrowWebhook>, 'build', NarrowBuild>
 
-export type HarborContainer<
+export type GantryContainer<
   NarrowWebhook extends WebhookTypesRaw = WebhookTypesRaw,
   NarrowBuild extends BuildTypesRaw = BuildTypesRaw> = {
   container: {

@@ -16,19 +16,19 @@ COPY --from=retrieve-webhook /webhook /webhook
 RUN go build github.com/adnanh/webhook
 
 # **nodejs build stage**
-FROM node:18 as build-harbor
+FROM node:18 as build-gantry
 
-WORKDIR /harbor
+WORKDIR /gantry
 
 # copy files for npm install
-COPY package.json       /harbor/package.json
-COPY package-lock.json  /harbor/package-lock.json
+COPY package.json       /gantry/package.json
+COPY package-lock.json  /gantry/package-lock.json
 
 # install node modules
 RUN npm ci
 
 # copy remaining files
-COPY . /harbor
+COPY . /gantry
 
 # create build
 RUN npm run build
@@ -40,8 +40,8 @@ WORKDIR /app
 
 # copy over builds
 COPY --from=build-webhook /webhook/webhook    /app/runtime/webhook
-COPY --from=build-harbor /harbor/dist         /app/dist
-COPY --from=build-harbor /harbor/node_modules /app/node_modules
+COPY --from=build-gantry /gantry/dist         /app/dist
+COPY --from=build-gantry /gantry/node_modules /app/node_modules
 
-# run harbor
+# run gantry
 CMD node dist/index.js watch

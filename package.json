@@ -1,11 +1,11 @@
 {
-  "name": "harbor",
+  "name": "gantry",
   "version": "1.0.0",
   "description": "Automate redeployment using webhooks",
   "main": "index.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JannikWibker/harbor.git"
+    "url": "git+https://github.com/JannikWibker/gantry.git"
   },
   "keywords": [
     "docker",
@@ -16,9 +16,9 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JannikWibker/harbor/issues"
+    "url": "https://github.com/JannikWibker/gantry/issues"
   },
-  "homepage": "https://github.com/JannikWibker/harbor#readme",
+  "homepage": "https://github.com/JannikWibker/gantry#readme",
   "scripts": {
     "start": "nodemon src/index.ts",
     "start:node": "ts-node src/index.ts",
