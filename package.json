@@ -21,7 +21,7 @@
   "homepage": "https://github.com/JannikWibker/gantry#readme",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "start:node": "ts-node src/index.ts",
+    "start:node": "node -r ts-node/register src/index.ts",
     "build": "tsc --project tsconfig.json && tsconfig-replace-paths --project tsconfig.json",
     "lint": "eslint .",
     "test": "jest",

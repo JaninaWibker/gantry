@@ -33,8 +33,12 @@ COPY . /gantry
 # create build
 RUN npm run build
 
+# remove all devDependencies as they aren't needed at runtime
+RUN rm -rf node_modules
+RUN npm ci --omit=dev
+
 # **execution stage**
-FROM node:18
+FROM gcr.io/distroless/nodejs:18
 
 WORKDIR /app
 
@@ -44,4 +48,4 @@ COPY --from=build-gantry /gantry/dist         /app/dist
 COPY --from=build-gantry /gantry/node_modules /app/node_modules
 
 # run gantry
-CMD node dist/index.js watch
+CMD ["dist/index.js", "watch"]

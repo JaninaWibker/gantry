@@ -1,7 +1,10 @@
 import path from 'path'
 import type Dockerode from 'dockerode'
 
-const IN_BUSYBOX_SCRIPT_FILE = path.join(process.cwd(), 'runtime', 'in-busybox.sh')
+// TODO: this must be the cwd on the host system!
+// TODO: therefore this is currently broken when running inside of docker and must be manually overwritten
+// TODO: to work properly; this will however be fixed as soon as custom options for gantry based on docker
+// TODO: labels are implemented.
 
 const DOCKER_SETTINGS = {
   AutoRemove: true,

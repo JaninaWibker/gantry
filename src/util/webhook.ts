@@ -3,9 +3,13 @@ import { spawn } from 'child_process'
 import { write_json_if_differ } from '$/util/fs'
 import type { GantryContainer, WebhookTypes } from '$/types/ContainerConfig'
 
-const COMMAND_WORKING_DIRECTORY = path.join(process.cwd(), 'runtime')
-const WEBHOOKS_EXECUTABLE = path.join(COMMAND_WORKING_DIRECTORY, 'webhook')
+const WEBHOOK_WORKING_DIRECTORY = path.join(process.cwd(), 'runtime')
+const COMMAND_WORKING_DIRECTORY = process.cwd()
+const WEBHOOKS_EXECUTABLE_PATH = path.join(WEBHOOK_WORKING_DIRECTORY, 'webhook')
 const HOOKS_FILE = path.join(process.cwd(), 'runtime', 'hooks.json')
+const NODE_EXECUTABLE_PATH = process.argv[0]
+
+console.log(NODE_EXECUTABLE_PATH)
 
 const generate_github_hook = (container: GantryContainer<WebhookTypes['github']>): object => {
 
@@ -34,9 +38,17 @@ const generate_github_hook = (container: GantryContainer<WebhookTypes['github']>
 
   return {
     'id': `redeploy-${container.config.name}`,
-    'execute-command': 'on-action.sh',
+    'execute-command': NODE_EXECUTABLE_PATH,
     'command-working-directory': COMMAND_WORKING_DIRECTORY,
     'pass-arguments-to-command': [
+      {
+        source: 'string',
+        name: 'dist/index.js'
+      },
+      {
+        source: 'string',
+        name: 'action'
+      },
       { // container id
         source: 'string',
         name: container.container.id
@@ -98,7 +110,7 @@ const update_webhooks = (containers: GantryContainer[]) => {
 
 const spawn_webhook = () => {
   // TODO: should this be verbose and should the port be configurable?
-  const child = spawn(WEBHOOKS_EXECUTABLE, ['-hooks', 'hooks.json', '-port', '8000', '-verbose'], { cwd: COMMAND_WORKING_DIRECTORY })
+  const child = spawn(WEBHOOKS_EXECUTABLE_PATH, ['-hooks', 'hooks.json', '-port', '8000', '-verbose'], { cwd: WEBHOOK_WORKING_DIRECTORY })
 
   child.on('exit', (code, signal) => {
     console.log(`[gantry] webhook quit with exit code ${code} and signal ${signal}`)
