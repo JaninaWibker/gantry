@@ -44,7 +44,7 @@ services:
     labels:
     - "gantry.self=true"
     - "gantry.user=1000"
-    - "gantry.cwd=/home/jannik/Desktop/projects/gantry/runtime"
+    - "gantry.cwd=/path/to/folder/with/in-busybox.sh/script"
     - "gantry.verbose=true"
     - "gantry.poll_interval=30"
     - "gantry.ignore_not_running=true"
