@@ -1,5 +1,5 @@
 import Docker from 'dockerode'
-import { get_configs, build_config_from_labels } from '$/util/config'
+import { get_configs, get_gantry_settings, build_config_from_labels } from '$/util/config'
 import { handle_arguments } from '$/util/cli'
 import { isLeft, isRight } from 'fp-ts/lib/Either'
 import * as D from 'io-ts/Decoder'
@@ -7,11 +7,25 @@ import { update_webhooks, spawn_webhook } from '$/util/webhook'
 import { handle_build } from '$/util/build'
 
 import type { Settings } from '$/util/cli'
-import type { GantryContainer } from './types/ContainerConfig'
+import type { GantrySettings, GantryContainer } from './types/ContainerConfig'
+
+const gantry_settings = (docker: Docker): Promise<GantrySettings> => docker.listContainers()
+  .then(get_gantry_settings)
+  .then(maybe_gantry_settings => {
+
+    if(maybe_gantry_settings === undefined)
+      throw new Error('There is no container identifying itself as gantry, you are probably missing the "gantry.self=true" label')
+
+    if(isLeft(maybe_gantry_settings))
+      throw new Error('Invalid gantry config, the following was reported\n' + D.draw(maybe_gantry_settings.left))
+
+    return maybe_gantry_settings.right
+  })
 
 const update_hooks = (docker: Docker, settings: Settings) => docker.listContainers()
   .then(get_configs)
   .then(containers => {
+
     const erroneous_containers = containers.filter(isLeft).map(container => container.left)
     const valid_containers     = containers.filter(isRight).map(container => container.right)
 
@@ -47,7 +61,7 @@ const print_job_failure = (error: Error) => {
 
 const docker = new Docker({ socketPath: '/var/run/docker.sock' })
 
-handle_arguments(docker, {
+handle_arguments(docker, gantry_settings, {
   on_watch: (settings: Settings) => {
     update_hooks(docker, settings)
       .then(spawn_webhook)

@@ -1,17 +1,14 @@
 import path from 'path'
 import type Dockerode from 'dockerode'
+import { GantrySettings } from '$/types/ContainerConfig'
 
-// TODO: this must be the cwd on the host system!
-// TODO: therefore this is currently broken when running inside of docker and must be manually overwritten
-// TODO: to work properly; this will however be fixed as soon as custom options for gantry based on docker
-// TODO: labels are implemented.
-
-const DOCKER_SETTINGS = {
+const DOCKER_SETTINGS = (cwd: string) => ({
   AutoRemove: true,
   privileged: true,
   NetworkMode: 'host',
   pidMode: 'host',
   ipcMode: 'host',
+  // Tty: false,
   Mounts: [{
     Type: 'bind',
     Source: '/',
@@ -20,14 +17,14 @@ const DOCKER_SETTINGS = {
     Consistency: 'default'
   }, {
     Type: 'bind',
-    Source: IN_BUSYBOX_SCRIPT_FILE,
+    Source: path.join(cwd, 'in-busybox.sh'),
     Target: '/in-busybox.sh',
     ReadOnly: true,
     Consistency: 'default'
   }]
-}
+})
 
-const run_on_host = (command: string, { cwd, user, docker }: { cwd: string, user: string, docker: Dockerode }) => {
+const run_on_host = (settings: GantrySettings, command: string, { cwd, user, docker }: { cwd: string, user: string, docker: Dockerode }) => {
 
   // make sure the username is nothing but letters and numbers
   const clean_user = user.replace(/[^a-zA-Z0-9]/g, '')
@@ -39,9 +36,10 @@ const run_on_host = (command: string, { cwd, user, docker }: { cwd: string, user
   const clean_cwd = path.normalize(cwd)
 
   // TODO: depending on verbosity use process.stdout or something else
+  // [process.stdout, process.stderr]
   return docker.run('busybox', ['sh', 'in-busybox.sh', clean_user, clean_cwd, command], process.stdout, {
     name: 'execute-on-host',
-    HostConfig: DOCKER_SETTINGS
+    HostConfig: DOCKER_SETTINGS(settings.cwd)
   })
 }
 

@@ -9,8 +9,6 @@ const WEBHOOKS_EXECUTABLE_PATH = path.join(WEBHOOK_WORKING_DIRECTORY, 'webhook')
 const HOOKS_FILE = path.join(process.cwd(), 'runtime', 'hooks.json')
 const NODE_EXECUTABLE_PATH = process.argv[0]
 
-console.log(NODE_EXECUTABLE_PATH)
-
 const generate_github_hook = (container: GantryContainer<WebhookTypes['github']>): object => {
 
   const signature_check = (secret: string) => ({
@@ -110,7 +108,7 @@ const update_webhooks = (containers: GantryContainer[]) => {
 
 const spawn_webhook = () => {
   // TODO: should this be verbose and should the port be configurable?
-  const child = spawn(WEBHOOKS_EXECUTABLE_PATH, ['-hooks', 'hooks.json', '-port', '8000', '-verbose'], { cwd: WEBHOOK_WORKING_DIRECTORY })
+  const child = spawn(WEBHOOKS_EXECUTABLE_PATH, ['-hooks', 'hooks.json', '-port', '8000', '-hotreload', '-verbose'], { cwd: WEBHOOK_WORKING_DIRECTORY })
 
   child.on('exit', (code, signal) => {
     console.log(`[gantry] webhook quit with exit code ${code} and signal ${signal}`)

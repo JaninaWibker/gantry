@@ -14,7 +14,7 @@ const compose_build = (settings: Settings, cwd: string, env_file?: string) => {
     ? `docker-compose --env-file ${env_file} build`
     : `docker-compose build`
 
-  return run_on_host(command, make_options(cwd, settings))
+  return run_on_host(settings, command, make_options(cwd, settings))
 }
 
 const compose_restart = (settings: Settings, cwd: string, env_file?: string) => {
@@ -23,12 +23,12 @@ const compose_restart = (settings: Settings, cwd: string, env_file?: string) => 
     ? `docker-compose --env-file ${env_file} up -d`
     : `docker-compose up -d`
 
-  return run_on_host(command, make_options(cwd, settings))
+  return run_on_host(settings, command, make_options(cwd, settings))
 }
 
 const git_pull = (settings: Settings, cwd: string) => {
 
-  return run_on_host('git pull', make_options(cwd, settings))
+  return run_on_host(settings, 'git pull', make_options(cwd, settings))
 }
 
 export {

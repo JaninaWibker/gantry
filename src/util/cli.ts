@@ -1,30 +1,22 @@
 import type Dockerode from 'dockerode'
+import type { GantrySettings } from '$/types/ContainerConfig'
 
-export type Settings = {
-  poll_interval: number,
-  ignore_not_running: boolean,
-  verbose: boolean,
-  docker: Dockerode,
-  user: string
+export type Settings = GantrySettings & {
+  docker: Dockerode
 }
 
-const handle_arguments = (docker: Dockerode, { on_watch, on_action }: { on_watch: (settings: Settings) => any, on_action: (settings: Settings, args: string[]) => any }) => {
+const handle_arguments = (docker: Dockerode, get_settings: (docker: Dockerode) => Promise<GantrySettings>, { on_watch, on_action }: { on_watch: (settings: Settings) => any, on_action: (settings: Settings, args: string[]) => any }) => {
   const [/* _node */, /* _pwd */, mode, ...args] = process.argv
 
-  // TODO: gantry should look at it's own docker labels (or use some defaults when not running inside docker) for settings
-  const DEFAULT_SETTINGS = {
-    poll_interval: 30,
-    ignore_not_running: false,
-    verbose: true, // TODO: this shouldn't be the default
-    docker: docker,
-    user: '1000' // TODO: THIS MOST DEF. SHOULDN'T BE ANY KIND OF DEFAULT
-  }
-
-  switch(mode) {
-    case 'watch':  return on_watch(DEFAULT_SETTINGS)
-    case 'action': return on_action(DEFAULT_SETTINGS, args)
-    default:       // TODO: some kind of error output
-  }
+  return get_settings(docker)
+    .then(settings => {
+      switch(mode) {
+        case 'watch':  return on_watch({ ...settings, docker: docker })
+        case 'action': return on_action({ ...settings, docker: docker }, args)
+        default:       throw new Error('No command line options supplied, should be either "watch" or "action"')
+      }
+    })
+    .catch(error => console.error(`[gantry] error: ${error.message}`))
 }
 
 export {

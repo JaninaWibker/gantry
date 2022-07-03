@@ -1,7 +1,6 @@
 # **retrieve webhook source code**
 FROM alpine/git as retrieve-webhook
 
-# TODO: this could be subject to change; might start using git submodules
 # clone webhook source
 RUN git clone https://github.com/adnanh/webhook /webhook
 

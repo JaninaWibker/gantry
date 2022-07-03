@@ -8,6 +8,33 @@ const string_array: D.Decoder<unknown, string[]> = pipe(
   D.parse(s => D.success(s.split(',')))
 )
 
+const default_value = <Type>(decoder: D.Decoder<unknown, Type>, value: Type): D.Decoder<unknown, Type> => ({
+  decode: (input: unknown) => input === undefined ? D.success(value) : decoder.decode(input)
+})
+
+const boolean_from_string: D.Decoder<unknown, boolean> = pipe(
+  D.string,
+  D.parse(s => s === 'true' ? D.success(true) : s === 'false' ? D.success(false) : D.failure(s, '"true" or "false"'))
+)
+
+const number_from_string: D.Decoder<unknown, number> = pipe(
+  D.string,
+  D.parse(s => !Number.isNaN(parseInt(s, 10))
+    ? D.success(parseInt(s))
+    : D.failure(s, 'a base 10 number encoded as a string')
+  )
+)
+
+const gantry_settings = D.struct({
+  user: D.string,
+  cwd: D.string,
+  verbose: default_value(boolean_from_string, false),
+  poll_interval: default_value(number_from_string, 30),
+  ignore_not_running: default_value(boolean_from_string, true)
+})
+
+export type GantrySettings = D.TypeOf<typeof gantry_settings>
+
 const container_build_config = D.union(
   /**
    * docker method:
@@ -103,5 +130,6 @@ export type GantryContainer<
 
 export {
   container_config,
+  gantry_settings,
   any
 }
