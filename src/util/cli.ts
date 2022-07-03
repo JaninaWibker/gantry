@@ -10,6 +10,9 @@ const handle_arguments = (docker: Dockerode, get_settings: (docker: Dockerode) =
 
   return get_settings(docker)
     .then(settings => {
+      if(settings.verbose) {
+        console.log(`started grantry with the following settings:\n${JSON.stringify(settings)}`)
+      }
       switch(mode) {
         case 'watch':  return on_watch({ ...settings, docker: docker })
         case 'action': return on_action({ ...settings, docker: docker }, args)

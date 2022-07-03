@@ -26,10 +26,25 @@ const number_from_string: D.Decoder<unknown, number> = pipe(
 )
 
 const gantry_settings = D.struct({
+  /**
+   * user to use on host system for updating
+   */
   user: D.string,
+  /**
+   * folder location where `in-busybox.sh` can be found
+   */
   cwd: D.string,
+  /**
+   * logging verbosity
+   */
   verbose: default_value(boolean_from_string, false),
+  /**
+   * interval (in seconds) for checking container labels
+   */
   poll_interval: default_value(number_from_string, 30),
+  /**
+   * ignore stopped containers
+   */
   ignore_not_running: default_value(boolean_from_string, true)
 })
 

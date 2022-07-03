@@ -5,3 +5,4 @@ dist
 .gitignore
 runtime/webhook
 runtime/hooks.json
+gantry.svg
