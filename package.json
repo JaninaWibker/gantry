@@ -5,7 +5,7 @@
   "main": "index.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JannikWibker/gantry.git"
+    "url": "git+https://github.com/JaninaWibker/gantry.git"
   },
   "keywords": [
     "docker",
@@ -16,9 +16,9 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JannikWibker/gantry/issues"
+    "url": "https://github.com/JaninaWibker/gantry/issues"
   },
-  "homepage": "https://github.com/JannikWibker/gantry#readme",
+  "homepage": "https://github.com/JaninaWibker/gantry#readme",
   "scripts": {
     "start": "nodemon src/index.ts",
     "start:node": "node -r ts-node/register src/index.ts",
